@@ -1,0 +1,28 @@
+{
+  "name": "resource-builder",
+  "version": "1.0.0",
+  "description": "rebase resources npm package",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ./src -c .eslintrc.json --ext ts,tsx --no-error-on-unmatched-pattern"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rebaseteams/resource-builder.git"
+  },
+  "author": "sarit-rebase",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rebaseteams/resource-builder/issues"
+  },
+  "homepage": "https://github.com/rebaseteams/resource-builder#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
+    "eslint": "^8.8.0"
+  },
+  "dependencies": {
+    "typescript": "^4.5.5"
+  }
+}
