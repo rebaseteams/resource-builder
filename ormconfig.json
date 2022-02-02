@@ -1,0 +1,16 @@
+{
+    "type": "postgres",
+    "host": "localhost",
+    "port" : 5432,
+    "username": "admin",
+    "password": "admin",
+    "database": "concert_curator",
+    "synchronize": false,
+    "logging": false,
+    "entities": [
+       "dist/entities/**/*.js"
+    ],
+    "cli": {
+       "entitiesDir": "src/entities"
+    }
+ }
