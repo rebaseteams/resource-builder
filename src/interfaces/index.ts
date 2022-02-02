@@ -1,7 +1,7 @@
 export interface GenericInterface<T>{
-    // create(data: T) : Promise<T>;
-    // find(item: T): Promise<T[]>;
+    create(data: T) : Promise<T>;
     findOne(id: string): Promise<T>;
-    // update(item: T) : Promise<T>;
-    // delete(id: string): Promise<boolean>;
+    find(skip : number, limit : number): Promise<T[]>;
+    update(data: T) : Promise<{success: boolean}>;
+    delete(id: string): Promise<{success: boolean}>;
 }
