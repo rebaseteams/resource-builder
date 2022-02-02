@@ -1,25 +1,25 @@
 import { Connection, Repository } from "typeorm";
-import { GenericInterface } from "../interfaces";
+import { RepoInterface } from "../interfaces";
 
-export class GenericRepo<T> implements GenericInterface<T>{
+export class BaseTypeORMRepo<T> implements RepoInterface<T>{
     private repository: Repository<T>
-    private type: string
+    private resourceName: string
 
-    constructor(connection: Connection, type: string) {
-      this.repository = connection.getRepository(type);
-      this.type = type
+      constructor(connection: Connection, resourceName: string) {
+      this.repository = connection.getRepository(resourceName);
+      this.resourceName = resourceName
       }
         async create(data: T): Promise<T> {
           const resp = await this.repository.save(data)
           if(resp) return data
-          const err = { message: `Cannot create ${this.type}`, statusCode: 404 };
+          const err = { message: `Cannot create ${this.resourceName}` };
           throw err;
         }
 
         async findOne(id: string): Promise<T> {
           const item = await this.repository.findOne(id) as T;
           if(item) return item;
-          const err = { message: `${this.type} not found for id: ${id}`, statusCode: 404 };
+          const err = { message: `${this.resourceName} not found for id: ${id}` };
           throw err;
         }
 
@@ -29,14 +29,14 @@ export class GenericRepo<T> implements GenericInterface<T>{
             skip,
           });
           if(items.length) return items;
-          const err = { message: `${this.type}s not found`, statusCode: 404 };
+          const err = { message: `${this.resourceName}s not found` };
           throw err;
         }
 
         async update(data: T): Promise<{ success: boolean }> {
           const resp = await this.repository.save(data)
           if(resp) return { success: true }
-          const err = { message: `Cannot update ${this.type}`, statusCode: 404 };
+          const err = { message: `Cannot update ${this.resourceName}` };
           throw err;
         }
 
@@ -45,7 +45,7 @@ export class GenericRepo<T> implements GenericInterface<T>{
           const affected = (await resp).affected
           if(affected && affected > 0)
           return { success: true };
-          const err = { message: `Cannot delete ${this.type} for id: ${id}`, statusCode: 404 };
+          const err = { message: `Cannot delete ${this.resourceName} for id: ${id}` };
           throw err;
         }
 
