@@ -93,4 +93,27 @@ describe('BaseTypeORMRepo', () => {
             await connection.close();
         })
     })
+
+    describe('find', ()=>{
+
+        it('should throw error when invalid skip or limit is passed', async () => {
+            const { base, connection } = await setup()
+            const actual = await base.find(null as unknown as number, null as unknown as number);
+            const expected: Error = {
+                name: 'Invalid query Error',
+                message: 'queries passed are not valid',
+            };
+            expect(actual).toStrictEqual(expected);
+            await connection.close();
+        });
+
+        it('should sucessfully find the resources', async () => {
+            const { base, connection } = await setup()
+            const data: TestResource = { id: '1', name: 'nns', description: 'ddd' }
+            await base.create(data);
+            const actual = await base.find(0, 1);
+            expect(actual).toEqual([data]);
+            await connection.close();
+        })
+    })
 })
