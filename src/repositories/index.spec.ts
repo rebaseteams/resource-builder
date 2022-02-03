@@ -40,8 +40,7 @@ describe('BaseTypeORMRepo', () => {
 
             const actual = await base.create(data);
             expect(actual).toBe(data);
-
-            await connection.close();
+            await connection.close(); 
         })
 
         it('should throw error when typeORM fails to persists', async () => {
@@ -60,4 +59,38 @@ describe('BaseTypeORMRepo', () => {
             await connection.close();
         });
     });
+
+    describe('findOne', ()=>{
+
+        it('should throw error when invalid id is passed', async () => {
+            const { base, connection } = await setup()
+            const actual = await base.findOne('');
+            const expected: Error = {
+                name: 'Invalid Id Error',
+                message: 'Id passed is not valid',
+            };
+            expect(actual).toStrictEqual(expected);
+            await connection.close();
+        });
+
+        it('should throw error when nothing found', async () => {
+            const { base, connection } = await setup()
+            const actual = await base.findOne('a');
+            const expected: Error = {
+                name: 'Find resource by Id Error',
+                message: 'TestResourceEntity not found for id: a',
+            };
+            expect(actual).toStrictEqual(expected);
+            await connection.close();
+        });
+
+        it('should sucessfully find the resource for given id', async () => {
+            const { base, connection } = await setup()
+            const data: TestResource = { id: '1', name: 'nns', description: 'ddd' }
+            await base.create(data);
+            const actual = await base.findOne('1');
+            expect(actual).toEqual(data);
+            await connection.close();
+        })
+    })
 })
