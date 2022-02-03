@@ -9,11 +9,20 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
       this.repository = connection.getRepository(resourceName);
       this.resourceName = resourceName
       }
-        async create(data: T): Promise<T> {
-          const resp = await this.repository.save(data)
-          if(resp) return data
-          const err = { message: `Cannot create ${this.resourceName}` };
-          throw err;
+        async create(data: T): Promise<T | Error> {
+          let resp: Awaited<T>;
+          try {
+            resp = await this.repository.save(data)
+            return resp;
+          } catch (e) {
+            const err: Error = {
+              name: 'Create Resource Error',
+              message: `Cannot create ${this.resourceName}`,
+              stack: (e as Error).toString()
+            };
+            return err;
+          }
+          
         }
 
         async findOne(id: string): Promise<T> {

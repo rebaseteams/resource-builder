@@ -1,47 +1,67 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import typeORM, { Connection, createConnection, Repository } from "typeorm"
+import { Column, Connection, ConnectionOptions, createConnection, Entity, PrimaryColumn } from "typeorm"
 import { BaseTypeORMRepo } from "."
 import { RepoInterface } from "../interfaces"
-import sinon from 'sinon'
 
 
 type TestResource = {
+    id: string;
     name: string;
     description: string;
 }
 
-describe('BaseTypeORMRepo', ()=>{
+@Entity()
+export class TestResourceEntity {
+    @PrimaryColumn() id: string;
+    @Column() name: string;
+    @Column() description: string;
+}
 
-    const setup = async (): Promise<{base: RepoInterface<TestResource>, connection: Connection}>=>{
-        console.log("before connection");
-        
-        const connection: Connection = await createConnection()
-        const base: RepoInterface<TestResource> = new BaseTypeORMRepo<TestResource>(connection, 'TestResource')
-        return {base, connection}
+describe('BaseTypeORMRepo', () => {
+
+    let base: RepoInterface<TestResource>;
+    let connection: Connection;
+
+    const setup = async (): Promise<{ base: RepoInterface<TestResource>, connection: Connection }> => {
+
+        const config: ConnectionOptions = {
+            name: 'default',
+            type: 'sqlite',
+            database: 'test-database',
+            entities: [
+                TestResourceEntity
+            ],
+            synchronize: true
+        };
+        const connection: Connection = await createConnection(config);
+        const base: RepoInterface<TestResource> = new BaseTypeORMRepo<TestResource>(connection, 'TestResourceEntity')
+        return { base, connection }
     }
-    describe('create', ()=>{
-        it('should sucessfully save written data when typeORM sucessfully persists', async ()=>{
-            const{ base, connection} = await setup()
-            const data: TestResource = {name:'nn', description:'dd'}
-            sinon.stub(connection, 'getRepository').callsFake(()=>{
-                console.log("calls fake fn");
-                
-                return new Repository<TestResource>() as Repository<any>
-            })
+    describe('create', () => {
+        it('should successfully save written data when typeORM sucessfully persists', async () => {
+            const { base, connection } = await setup()
+            const data: TestResource = { id: '1', name: 'nn', description: 'dd' }
 
-            sinon.stub(typeORM, 'createConnection').callsFake( async ()=>{
-                const options: typeORM.ConnectionOptions = {
-                    type:"postgres",
-                    driver:"fakeDriver",
-                    database:"fakeDatabase"
-                }
-                console.log("calls fake fn of connection")
-                return new Connection(options)
-            })
-            base.create(data)
-            
+            const actual = await base.create(data);
+            expect(actual).toBe(data);
+
+            await connection.close();
         })
 
-        // it.skip('should throw error when typeORM fails to persists')
-    })
+        it('should throw error when typeORM fails to persists', async () => {
+            const { base, connection } = await setup()
+            const data: TestResource = { id: '1', name: 'nn', description: 'dd' }
+
+            const actual = await base.create({} as TestResourceEntity);
+
+            const expected: Error = {
+                name: 'Create Resource Error',
+                message: 'Cannot create TestResourceEntity',
+                stack: 'QueryFailedError: SQLITE_CONSTRAINT: NOT NULL constraint failed: test_resource_entity.id'
+            };
+
+            expect(actual).toStrictEqual(expected);
+
+            await connection.close();
+        });
+    });
 })
