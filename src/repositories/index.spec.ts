@@ -18,9 +18,6 @@ export class TestResourceEntity {
 
 describe('BaseTypeORMRepo', () => {
 
-    let base: RepoInterface<TestResource>;
-    let connection: Connection;
-
     const setup = async (): Promise<{ base: RepoInterface<TestResource>, connection: Connection }> => {
 
         const config: ConnectionOptions = {
@@ -49,7 +46,6 @@ describe('BaseTypeORMRepo', () => {
 
         it('should throw error when typeORM fails to persists', async () => {
             const { base, connection } = await setup()
-            const data: TestResource = { id: '1', name: 'nn', description: 'dd' }
 
             const actual = await base.create({} as TestResourceEntity);
 
