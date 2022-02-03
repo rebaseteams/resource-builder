@@ -10,9 +10,6 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
       this.repository = connection.getRepository(resourceName);
       this.resourceName = resourceName
       }
-        update(data: T): Promise<{ success: boolean; }> {
-          throw new Error("Method not implemented.");
-        }
         delete(id: string): Promise<{ success: boolean; }> {
           throw new Error("Method not implemented.");
         }
@@ -82,12 +79,19 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
           }
         }
 
-        // async update(data: T): Promise<{ success: boolean }> {
-        //   const resp = await this.repository.save(data)
-        //   if(resp) return { success: true }
-        //   const err = { message: `Cannot update ${this.resourceName}` };
-        //   throw err;
-        // }
+        async update(data: T): Promise<{ success: boolean }| Error> {
+          try {
+            await this.repository.save(data)
+            return { success: true }
+          } catch (e) {
+            const err: Error = {
+              name: 'Update Resource Error',
+              message: `Error occured while updating ${this.resourceName}`,
+              stack: (e as Error).toString()
+            };
+            return err;
+          }
+        }
 
         // async delete(id: string): Promise<{success: boolean}> {
         //   const resp =this.repository.delete(id);

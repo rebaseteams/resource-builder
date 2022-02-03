@@ -116,4 +116,29 @@ describe('BaseTypeORMRepo', () => {
             await connection.close();
         })
     })
+
+    describe('update', ()=>{
+
+        it('should successfully update the resource', async () => {
+            const { base, connection } = await setup()
+            const orignalData: TestResource = { id: '1', name: 'nn', description: 'dd44' }
+            const newData: TestResource = { id: '1', name: 'aa', description: 'aaa' }
+            await base.create(orignalData);
+            const actual = await base.update(newData)
+            expect(actual).toStrictEqual({success: true});
+            await connection.close();
+        });
+
+        it('should throw error when typeORM fails to persists', async () => {
+            const { base, connection } = await setup()
+            const actual = await base.update({} as TestResourceEntity);
+            const expected: Error = {
+                name: 'Update Resource Error',
+                message: 'Error occured while updating TestResourceEntity',
+                stack: 'QueryFailedError: SQLITE_CONSTRAINT: NOT NULL constraint failed: test_resource_entity.id'
+            };
+            expect(actual).toStrictEqual(expected);
+            await connection.close();
+        });
+    })
 })
