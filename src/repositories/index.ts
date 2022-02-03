@@ -38,8 +38,8 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
         async findOne(id: string): Promise<T | Error> {
           if(!id){
             const err: Error = {
-              name: 'Find resource by Id Error',
-              message: `${this.resourceName} not found for id: ${id}`,
+              name: 'Invalid Id Error',
+              message: `Id passed is not valid`,
             };
             return err
           }
@@ -53,8 +53,8 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
             return err
           } catch (e) {
             const err: Error = {
-              name: 'Find resource by Id Error',
-              message: `${this.resourceName} not found for id: ${id}`,
+              name: 'Find resource by Id Internal Error',
+              message: `Internal error occured while finding ${this.resourceName} id: ${id}`,
               stack: (e as Error).toString()
             };
             return err
