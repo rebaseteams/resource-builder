@@ -141,4 +141,38 @@ describe('BaseTypeORMRepo', () => {
             await connection.close();
         });
     })
+
+    describe('delete', ()=>{
+
+        it('should throw error when invalid id is passed', async () => {
+            const { base, connection } = await setup()
+            const actual = await base.delete('');
+            const expected: Error = {
+                name: 'Invalid Id Error',
+                message: 'Id passed is not valid',
+            };
+            expect(actual).toStrictEqual(expected);
+            await connection.close();
+        });
+
+        it('should successfully delete the resource', async () => {
+            const { base, connection } = await setup()
+            const data: TestResource = { id: '1', name: 'nn', description: 'dd44' }
+            await base.create(data);
+            const actual = await base.delete('1')
+            expect(actual).toStrictEqual({success: true});
+            await connection.close();
+        });
+
+        it('should throw error when unregistered id is passed', async () => {
+            const { base, connection } = await setup()
+            const actual = await base.delete('ssss');
+            const expected: Error = {
+                name: 'Delete Resource Error',
+                message: 'Error occured while deleting TestResourceEntity for id: ssss',
+            };
+            expect(actual).toStrictEqual(expected);
+            await connection.close();
+        });
+    })
 })

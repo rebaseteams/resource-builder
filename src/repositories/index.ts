@@ -10,9 +10,6 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
       this.repository = connection.getRepository(resourceName);
       this.resourceName = resourceName
       }
-        delete(id: string): Promise<{ success: boolean; }> {
-          throw new Error("Method not implemented.");
-        }
         async create(data: T): Promise<T | Error> {
           let resp: Awaited<T>;
           try {
@@ -93,13 +90,33 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
           }
         }
 
-        // async delete(id: string): Promise<{success: boolean}> {
-        //   const resp =this.repository.delete(id);
-        //   const affected = (await resp).affected
-        //   if(affected && affected > 0)
-        //   return { success: true };
-        //   const err = { message: `Cannot delete ${this.resourceName} for id: ${id}` };
-        //   throw err;
-        // }
+        async delete(id: string): Promise<{success: boolean}| Error> {
+          if(!id){
+            const err: Error = {
+              name: 'Invalid Id Error',
+              message: `Id passed is not valid`,
+            };
+            return err
+          }
+          try {
+            const resp = await this.repository.delete(id);
+            const affected = resp.affected
+            if(affected && affected > 0){
+              return { success: true };
+            }
+            const err: Error = {
+              name: 'Delete Resource Error',
+              message: `Error occured while deleting ${this.resourceName} for id: ${id}`,
+            };
+            return err;
+          } catch (e) {
+            const err: Error = {
+              name: 'Delete Resource Error',
+              message: `Internal Error occured while deleting ${this.resourceName}`,
+              stack: (e as Error).toString()
+            };
+            return err;
+          }
+        }
 
 }
