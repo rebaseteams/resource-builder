@@ -10,9 +10,6 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
       this.repository = connection.getRepository(resourceName);
       this.resourceName = resourceName
       }
-        find(skip: number, limit: number): Promise<Error | T[]> {
-          throw new Error("Method not implemented.");
-        }
         update(data: T): Promise<{ success: boolean; }> {
           throw new Error("Method not implemented.");
         }
@@ -61,15 +58,29 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
           }
         }
 
-        // async find(skip : number, limit : number): Promise<T[]> {
-        //   const items: T[] = await this.repository.find({
-        //     take: limit,
-        //     skip,
-        //   });
-        //   if(items.length) return items;
-        //   const err = { message: `${this.resourceName}s not found` };
-        //   throw err;
-        // }
+        async find(skip : number, limit : number): Promise<T[] | Error> {
+          if(!skip && !limit){
+            const err: Error = {
+              name: 'Invalid query Error',
+              message: `queries passed are not valid`,
+            };
+            return err
+          }
+          try {
+            const items: T[] = await this.repository.find({
+              take: limit,
+              skip,
+            });
+            return items
+          } catch (e) {
+            const err: Error = {
+              name: 'Find resource Internal Error',
+              message: `Internal error occured while finding ${this.resourceName}`,
+              stack: (e as Error).toString()
+            };
+            return err
+          }
+        }
 
         // async update(data: T): Promise<{ success: boolean }> {
         //   const resp = await this.repository.save(data)
