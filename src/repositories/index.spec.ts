@@ -96,12 +96,25 @@ describe('BaseTypeORMRepo', () => {
 
     describe('find', ()=>{
 
-        it('should throw error when invalid skip or limit is passed', async () => {
+        it('should throw error when invalid skip in filters is passed', async () => {
             const { base, connection } = await setup()
-            const actual = await base.find(null as unknown as number, null as unknown as number);
+            const actual = await base.find({skip: {} as unknown as number, take: 5});
             const expected: Error = {
-                name: 'Invalid query Error',
-                message: 'queries passed are not valid',
+                name: 'Find resource Internal Error',
+                message: 'Internal error occured while finding TestResourceEntity',
+                stack: 'TypeORMError: Provided "skip" value is not a number. Please provide a numeric value.'
+            };
+            expect(actual).toStrictEqual(expected);
+            await connection.close();
+        });
+
+        it('should throw error when invalid limit in filters is passed', async () => {
+            const { base, connection } = await setup()
+            const actual = await base.find({skip: 0, take: {} as unknown as number});
+            const expected: Error = {
+                name: 'Find resource Internal Error',
+                message: 'Internal error occured while finding TestResourceEntity',
+                stack: 'TypeORMError: Provided "take" value is not a number. Please provide a numeric value.'
             };
             expect(actual).toStrictEqual(expected);
             await connection.close();
@@ -111,7 +124,7 @@ describe('BaseTypeORMRepo', () => {
             const { base, connection } = await setup()
             const data: TestResource = { id: '1', name: 'nns', description: 'ddd' }
             await base.create(data);
-            const actual = await base.find(0, 1);
+            const actual = await base.find({skip: 0, take:1});
             expect(actual).toEqual([data]);
             await connection.close();
         })

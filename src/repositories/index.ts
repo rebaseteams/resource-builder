@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Connection, Repository } from "typeorm";
+import { Connection, FindManyOptions, Repository } from "typeorm";
 import { RepoInterface } from "../interfaces";
 
 export class BaseTypeORMRepo<T> implements RepoInterface<T>{
@@ -52,19 +52,9 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
           }
         }
 
-        async find(skip : number, limit : number): Promise<T[] | Error> {
-          if(!skip && !limit){
-            const err: Error = {
-              name: 'Invalid query Error',
-              message: `queries passed are not valid`,
-            };
-            return err
-          }
+        async find(filters?: FindManyOptions<T>): Promise<T[] | Error> {
           try {
-            const items: T[] = await this.repository.find({
-              take: limit,
-              skip,
-            });
+            const items: T[] = await this.repository.find(filters);
             return items
           } catch (e) {
             const err: Error = {
