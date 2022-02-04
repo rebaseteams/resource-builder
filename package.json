@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "rebase resources npm package",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "lint": "eslint ./src -c .eslintrc.json --ext ts,tsx --no-error-on-unmatched-pattern"
