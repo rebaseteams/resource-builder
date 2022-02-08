@@ -27,3 +27,45 @@ jobs:
     - name: Lint
       run: |
         npm run lint
+
+  test : 
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 14.x]
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Pre-install
+      run: |
+        npm install
+    - name: Test
+      run: |
+        npm run test
+
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [lint,test]
+
+    strategy:
+      matrix:
+        node-version: [ 14.x]
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: https://registry.npm.js.org
+    - name: Publish
+      run: |
+        npm publish --access publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}

@@ -1,6 +1,6 @@
 {
-  "name": "resource-builder",
-  "version": "1.0.0",
+  "name": "typeorm-generic",
+  "version": "0.0.1",
   "description": "rebase resources npm package",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
