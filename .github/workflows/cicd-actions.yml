@@ -64,6 +64,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: https://registry.npm.js.org
+    - name: Pre-install
+      run: |
+        npm install
     - name: Publish
       run: |
         npm publish --access public
