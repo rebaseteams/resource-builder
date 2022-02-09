@@ -44,9 +44,9 @@ jobs:
     - name: Pre-install
       run: |
         npm install
-    - name: Test
-      run: |
-        npm run test
+    # - name: Test
+    #   run: |
+    #     npm run test
 
   publish:
     if: github.ref == 'refs/heads/main'
