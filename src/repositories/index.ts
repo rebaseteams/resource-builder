@@ -10,7 +10,7 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
       this.repository = connection.getRepository(resourceName);
       this.resourceName = resourceName
       }
-        async create(data: T): Promise<T> {
+        async create(data: T): Promise<T | Error> {
           let resp: Awaited<T>;
           try {
             resp = await this.repository.save(data)
@@ -21,17 +21,18 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
               message: `Cannot create ${this.resourceName}`,
               stack: (e as Error).toString()
             };
-            throw err;
+            return err;
           }
+          
         }
 
-        async findOne(id: string): Promise<T> {
+        async findOne(id: string): Promise<T | Error> {
           if(!id){
             const err: Error = {
               name: 'Invalid Id Error',
               message: `Id passed is not valid`,
             };
-            throw err
+            return err
           }
           try {
             const item = await this.repository.findOne(id) as T;
@@ -40,18 +41,18 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
               name: 'Find resource by Id Error',
               message: `${this.resourceName} not found for id: ${id}`,
             };
-            throw err
+            return err
           } catch (e) {
             const err: Error = {
               name: 'Find resource by Id Internal Error',
               message: `Internal error occured while finding ${this.resourceName} id: ${id}`,
               stack: (e as Error).toString()
             };
-            throw err
+            return err
           }
         }
 
-        async find(filters?: FindManyOptions<T>): Promise<T[]> {
+        async find(filters?: FindManyOptions<T>): Promise<T[] | Error> {
           try {
             const items: T[] = await this.repository.find(filters);
             return items
@@ -61,11 +62,11 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
               message: `Internal error occured while finding ${this.resourceName}`,
               stack: (e as Error).toString()
             };
-            throw err
+            return err
           }
         }
 
-        async update(data: T): Promise<{ success: boolean }> {
+        async update(data: T): Promise<{ success: boolean }| Error> {
           try {
             await this.repository.save(data)
             return { success: true }
@@ -75,17 +76,17 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
               message: `Error occured while updating ${this.resourceName}`,
               stack: (e as Error).toString()
             };
-            throw err;
+            return err;
           }
         }
 
-        async delete(id: string): Promise<{success: boolean}> {
+        async delete(id: string): Promise<{success: boolean}| Error> {
           if(!id){
             const err: Error = {
               name: 'Invalid Id Error',
               message: `Id passed is not valid`,
             };
-            throw err
+            return err
           }
           try {
             const resp = await this.repository.delete(id);
@@ -97,14 +98,14 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
               name: 'Delete Resource Error',
               message: `Error occured while deleting ${this.resourceName} for id: ${id}`,
             };
-            throw err;
+            return err;
           } catch (e) {
             const err: Error = {
               name: 'Delete Resource Error',
               message: `Internal Error occured while deleting ${this.resourceName}`,
               stack: (e as Error).toString()
             };
-            throw err;
+            return err;
           }
         }
 

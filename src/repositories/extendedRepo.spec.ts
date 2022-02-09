@@ -21,7 +21,7 @@ describe('ExtendedTypeORMRepo', ()=>{
             super(connection, resourceName)
         }
 
-        async create(data: TestResource): Promise<TestResource> {
+        async create(data: TestResource): Promise<TestResource | Error> {
             const regexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi; 
             const isUUID = regexExp.test(data.id)
             if(isUUID){
@@ -31,7 +31,7 @@ describe('ExtendedTypeORMRepo', ()=>{
                 name: 'Invalid Id Error',
                 message: `Id passed is not valid UUID`,
                 };
-            throw err
+            return err
         }
     }
 

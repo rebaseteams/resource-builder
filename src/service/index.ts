@@ -8,23 +8,23 @@ export class BaseTypeORMService<T> implements RepoInterface<T>{
         this.repo = repo
     }
 
-    async create(data: T): Promise<T> {
+    async create(data: T): Promise<T | Error> {
         return this.repo.create(data);
     }
 
-    async findOne(id: string): Promise<T> {
+    async findOne(id: string): Promise<T | Error> {
         return this.repo.findOne(id);
     }
 
-    async find(filters?: FindManyOptions<T>): Promise<T[]> {
+    async find(filters?: FindManyOptions<T>): Promise<Error | T[]> {
         return this.repo.find(filters);
     }
 
-    async update(data: T): Promise<{ success: boolean; }> {
+    async update(data: T): Promise<{ success: boolean; } | Error> {
         return this.repo.update(data);
     }
 
-    async delete(id: string): Promise<{ success: boolean; }> {
+    async delete(id: string): Promise<Error | { success: boolean; }> {
         return this.repo.delete(id)
     }
 }
