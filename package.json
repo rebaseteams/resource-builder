@@ -1,12 +1,13 @@
 {
   "name": "@rebaseitlabs/typeorm-generic",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "rebase resources npm package",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest --coverage",
-    "lint": "eslint ./src -c .eslintrc.json --ext ts,tsx --no-error-on-unmatched-pattern"
+    "lint": "eslint ./src -c .eslintrc.json --ext ts,tsx --no-error-on-unmatched-pattern",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",

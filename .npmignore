@@ -1,9 +1,11 @@
 .github
 coverage
-node_nodules
+node_modules
+src
 .eslintignore
 .eslintrc.json
 .gitignore
 jest.config.js
 package-lock.json
 tsconfig.json
+test-database
