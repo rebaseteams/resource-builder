@@ -1,5 +1,5 @@
 {
-  "name": "typeorm-generic",
+  "name": "@rebaseitlabs/typeorm-generic",
   "version": "0.0.5",
   "description": "rebase resources npm package",
   "main": "dist/index.js",
