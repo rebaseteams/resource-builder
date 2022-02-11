@@ -15,10 +15,26 @@ export class TestResourceEntity {
     @Column() description: string;
 }
 
+function mapEntityToType(entity: TestResourceEntity): TestResource {
+    return {
+        id: entity.id,
+        name: entity.name,
+        description: entity.description,
+    }
+}
+
+function mapTypeToEntity(type: TestResource): TestResourceEntity {
+    return {
+        id: type.id,
+        name: type.name,
+        description: type.description,
+    }
+}
+
 describe('ExtendedTypeORMRepo', ()=>{
-    class ExtendedTypeORMRepo extends BaseTypeORMRepo<TestResource>{
+    class ExtendedTypeORMRepo extends BaseTypeORMRepo<TestResource, TestResourceEntity>{
         constructor(connection: Connection, resourceName: string){
-            super(connection, resourceName)
+            super(connection, resourceName, mapEntityToType, mapTypeToEntity)
         }
 
         async create(data: TestResource): Promise<TestResource | Error> {
@@ -57,7 +73,7 @@ describe('ExtendedTypeORMRepo', ()=>{
             const data: TestResource = { id: 'a24a6ea4-ce75-4665-a070-57453082c256', name: 'nn', description: 'dd' }
 
             const actual = await repo.create(data);
-            expect(actual).toBe(data);
+            expect(actual).toStrictEqual(data);
             await connection.close(); 
         })
 
