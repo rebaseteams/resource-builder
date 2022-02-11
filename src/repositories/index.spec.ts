@@ -16,6 +16,22 @@ export class TestResourceEntity {
     @Column() description: string;
 }
 
+function mapEntityToType(entity: TestResourceEntity): TestResource {
+    return {
+        id: entity.id,
+        name: entity.name,
+        description: entity.description,
+    }
+}
+
+function mapTypeToEntity(type: TestResource): TestResourceEntity {
+    return {
+        id: type.id,
+        name: type.name,
+        description: type.description,
+    }
+}
+
 describe('BaseTypeORMRepo', () => {
 
     const setup = async (): Promise<{ base: RepoInterface<TestResource>, connection: Connection }> => {
@@ -30,7 +46,8 @@ describe('BaseTypeORMRepo', () => {
             synchronize: true
         };
         const connection: Connection = await createConnection(config);
-        const base: RepoInterface<TestResource> = new BaseTypeORMRepo<TestResource>(connection, 'TestResourceEntity')
+        const base: RepoInterface<TestResource> = new BaseTypeORMRepo<TestResource, TestResourceEntity>
+            (connection, 'TestResourceEntity', mapEntityToType, mapTypeToEntity)
         return { base, connection }
     }
     describe('create', () => {
@@ -39,7 +56,7 @@ describe('BaseTypeORMRepo', () => {
             const data: TestResource = { id: '1', name: 'nn', description: 'dd' }
 
             const actual = await base.create(data);
-            expect(actual).toBe(data);
+            expect(actual).toStrictEqual(data);
             await connection.close(); 
         })
 

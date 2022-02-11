@@ -2,19 +2,29 @@
 import { Connection, FindManyOptions, Repository } from "typeorm";
 import { RepoInterface } from "../interfaces";
 
-export class BaseTypeORMRepo<T> implements RepoInterface<T>{
-    private repository: Repository<T>
-    private resourceName: string
+export class BaseTypeORMRepo<T, U> implements RepoInterface<T>{
+    private repository: Repository<U>;
+    private resourceName: string;
+    private typeToEntity: (t: T) => U;
+    private entityToType: (u: U) => T;
 
-      constructor(connection: Connection, resourceName: string) {
-      this.repository = connection.getRepository(resourceName);
-      this.resourceName = resourceName
+      constructor(
+        connection: Connection,
+        resourceName: string,
+        entityToType: (u: U) => T, 
+        typeToEntity: (t: T) => U,
+      ) {
+        this.repository = connection.getRepository(resourceName);
+        this.resourceName = resourceName;
+        this.typeToEntity = typeToEntity;
+        this.entityToType = entityToType;
       }
         async create(data: T): Promise<T | Error> {
-          let resp: Awaited<T>;
+          let resp: Awaited<U>;
           try {
-            resp = await this.repository.save(data)
-            return resp;
+            const entityData = this.typeToEntity(data);
+            resp = await this.repository.save(entityData);
+            return this.entityToType(resp);
           } catch (e) {
             const err: Error = {
               name: 'Create Resource Error',
@@ -35,8 +45,10 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
             return err
           }
           try {
-            const item = await this.repository.findOne(id) as T;
-            if(item) {return item;}
+            const item = await this.repository.findOne(id) as U;
+            if (item) {
+              return this.entityToType(item);
+            }
             const err: Error = {
               name: 'Find resource by Id Error',
               message: `${this.resourceName} not found for id: ${id}`,
@@ -52,10 +64,10 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
           }
         }
 
-        async find(filters?: FindManyOptions<T>): Promise<T[] | Error> {
+        async find(filters?: FindManyOptions<any>): Promise<T[] | Error> {
           try {
-            const items: T[] = await this.repository.find(filters);
-            return items
+            const items: U[] = await this.repository.find(filters);
+            return items.map(this.entityToType);
           } catch (e) {
             const err: Error = {
               name: 'Find resource Internal Error',
@@ -68,8 +80,9 @@ export class BaseTypeORMRepo<T> implements RepoInterface<T>{
 
         async update(data: T): Promise<{ success: boolean }| Error> {
           try {
-            await this.repository.save(data)
-            return { success: true }
+            const entityData = this.typeToEntity(data);
+            await this.repository.save(entityData);
+            return { success: true };
           } catch (e) {
             const err: Error = {
               name: 'Update Resource Error',
